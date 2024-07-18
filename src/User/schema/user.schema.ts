@@ -1,10 +1,13 @@
 import * as mongoose from 'mongoose';
 
-export const BlogSchema = new mongoose.Schema({
+export const UserSchema = new mongoose.Schema({
   name: {
     type: String,
   },
   phone: {
+    type: Number,
+  },
+  countryCode: {
     type: Number,
   },
   email: {
