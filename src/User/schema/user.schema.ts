@@ -1,4 +1,5 @@
 import * as mongoose from 'mongoose';
+import { enumValue } from 'src/utils/enum';
 
 export const UserSchema = new mongoose.Schema({
   name: {
@@ -24,5 +25,9 @@ export const UserSchema = new mongoose.Schema({
   },
   clgName: {
     type: String,
+  },
+  userType: {
+    type: String,
+    enum: Object.values(enumValue.userType),
   },
 });

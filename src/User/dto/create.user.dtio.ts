@@ -1,34 +1,43 @@
-import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
-
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsString,
+  MinLength,
+  IsEnum,
+} from 'class-validator';
+import { enumValue } from 'src/utils/enum';
 export class CreateUserDTO {
   @IsNotEmpty()
   @IsString()
-  readonly name: string;
+  name: string;
 
   @IsNotEmpty()
   @IsString()
-  readonly phone: string;
+  phone: string;
 
   @IsNotEmpty()
   @IsString()
-  readonly countryCode: string;
+  countryCode: string;
 
   @IsNotEmpty()
   @IsEmail()
-  readonly email: string;
+  email: string;
 
   @IsNotEmpty()
   @MinLength(8)
-  readonly password: string;
+  password: string;
 
   @IsString()
-  readonly image?: string;
-
-  @IsNotEmpty()
-  @IsString()
-  readonly clgId: string;
+  image?: string;
 
   @IsNotEmpty()
   @IsString()
-  readonly clgName: string;
+  clgId: string;
+
+  @IsNotEmpty()
+  @IsString()
+  clgName: string;
+
+  @IsEnum(enumValue.userType)
+  userType: string;
 }

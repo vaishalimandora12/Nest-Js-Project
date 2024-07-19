@@ -17,8 +17,9 @@ export class UserController {
   constructor(private userService: UserService) {}
 
   @Post('signup')
-  @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
+  @UsePipes(new ValidationPipe({ whitelist: false, forbidNonWhitelisted: false }))
   async signUp(@Body() createUserDto: CreateUserDTO, @Res() res: Response) {
+
     try {
       const result = await this.userService.signUpUser(createUserDto);
       return res.status(result.status).json(result);

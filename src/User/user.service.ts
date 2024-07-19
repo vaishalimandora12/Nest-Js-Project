@@ -3,14 +3,30 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { UserInterface } from './interface/user.interface';
 import { CreateUserDTO } from './dto/create.user.dtio';
+import { CreateSessionDTO } from 'src/Session/dto/create.session.dto';
+import { SessionInterface } from 'src/Session/interface/session.interface';
 import * as bcrypt from 'bcrypt';
+import { JwtService } from '@nestjs/jwt';
+import { enumValue } from 'src/utils/enum';
 @Injectable()
 export class UserService {
-  constructor(@InjectModel('User') private userModel: Model<UserInterface>) {}
-
+  constructor(
+    private jwtService: JwtService,
+    @InjectModel('User') private userModel: Model<UserInterface>,
+    @InjectModel('Session') private sessionModel: Model<SessionInterface>,
+  ) {}
   async signUpUser(signUpData: CreateUserDTO): Promise<any> {
-    const { name, phone, countryCode, email, password, image, clgId, clgName } =
-      signUpData;
+    const {
+      name,
+      phone,
+      countryCode,
+      email,
+      password,
+      image,
+      clgId,
+      clgName,
+      userType,
+    } = signUpData;
     const findUser = await this.userModel.findOne({ email: email });
     if (findUser) {
       return {
@@ -25,10 +41,22 @@ export class UserService {
     };
     const create = await this.userModel.create(refData);
     if (create) {
+      let signToken = this.jwtService.sign({
+        userId: create._id,
+        email: create.email,
+      });
+      const sessionData: CreateSessionDTO = {
+        accessToken: signToken,
+        userId: create._id.toString(),
+        userType: create.userType,
+      };
+      const createSession = await this.sessionModel.create(sessionData);
+      const User = await this.userModel.findOne({ _id: create._id }, { password: 0 });
       return {
         message: 'User Created Successfully',
         status: 200,
-        data: create,
+        data:User,createSession,
+        
       };
     }
     return {
@@ -37,7 +65,7 @@ export class UserService {
     };
   }
 
-  async deleteUser(user_id: string): Promise<any> {
+  async deleteUser(user_id:string): Promise<any> {
     const deleteUser = await this.userModel.findByIdAndDelete({
       _id: user_id,
     });
