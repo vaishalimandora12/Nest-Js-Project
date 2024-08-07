@@ -51,12 +51,15 @@ export class UserService {
         userType: create.userType,
       };
       const createSession = await this.sessionModel.create(sessionData);
-      const User = await this.userModel.findOne({ _id: create._id }, { password: 0 });
+      const User = await this.userModel.findOne(
+        { _id: create._id },
+        { password: 0 },
+      );
       return {
         message: 'User Created Successfully',
         status: 200,
-        data:User,createSession,
-        
+        data: User,
+        createSession,
       };
     }
     return {
@@ -65,7 +68,30 @@ export class UserService {
     };
   }
 
-  async deleteUser(user_id:string): Promise<any> {
+  async login(loginData: CreateUserDTO): Promise<any>{
+    const { email, password } = loginData;
+    const findUser = await this.userModel.findOne({ email: email });
+    if (!findUser) {
+      return {
+        message: 'User Not Found',
+        status: 400,
+      };
+    }
+    const com_pass = await bcrypt.compare(password, findUser.password);
+      if (!com_pass) {
+        return {
+          message: 'Password Invalid.',
+          status: 400,
+        };
+    }
+     let signToken = this.jwtService.sign({
+       userId: findUser._id,
+       email: findUser.email,
+     });
+      const createSession = await this.sessionModel.updateOne(sessionData);
+  }
+
+  async deleteUser(user_id: string): Promise<any> {
     const deleteUser = await this.userModel.findByIdAndDelete({
       _id: user_id,
     });
